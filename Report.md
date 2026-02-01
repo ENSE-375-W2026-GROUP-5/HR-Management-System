@@ -1,4 +1,4 @@
-![UofR](assetslogo.png)
+![UofR](assets/logo.png)
 
 
 # **ENSE 375 – Software Testing and Validation**
