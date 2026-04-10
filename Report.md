@@ -114,11 +114,12 @@ For example, PENDING → APPROVED, PENDING → REJECTED, PENDING → CANCELLED
     The system correctly allowed valid state changes and blocked invalid transitions.
 
 ##### 3.3.4 Limitations
+
 Although the HR Management System successfully implements core functionalities such as employee management, authentication, and leave processing, several limitations remain in the current design.
 
-    - The system uses a command-line interface (CLI), which limits usability.
-    - Passwords are stored in plain text, which is not secure for real-world applications.
-    - Lack of advanced input validation in the user interface. While validation is handled at the service layer, the CLI does not prevent incorrect formats like invalid dates and string checking for numbers before processing.
-    - Does not support multi user interaction
-    - Simple database design is not optimized for large records
-    - While testing was performed using multiple techniques, it is still not enough to get appropriate coverage.
+- The system uses a command-line interface (CLI), which limits usability.
+- Passwords are stored in plain text, which is not secure for real-world applications.
+- Lack of advanced input validation in the user interface. While validation is handled at the service layer, the CLI does not prevent incorrect formats like invalid dates and string checking for numbers before processing.
+- Does not support multi user interaction
+- Simple database design is not optimized for large records
+- While testing was performed using multiple techniques, it is still not enough to get appropriate coverage.
