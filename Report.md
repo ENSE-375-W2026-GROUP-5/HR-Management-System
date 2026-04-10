@@ -97,3 +97,18 @@ Result:
 This testing confirmed that the system correctly accepted valid input classes and rejected invalid ones.
 
 - Boundary Value Testing
+Boundary value testing was used to check values near the limits of valid input ranges. For example:
+
+    - Salary values such as 0 and negative salary
+    - Leave balance values such as 0 and negative leave balance
+    - Leave request days equal to available leave balance and greater than available leave balance
+
+Result:
+The system handled boundary conditions correctly in most tested cases, particularly for salary, leave balance, and leave request validation.
+
+- State transition testing 
+State transition testing was used for leave request processing because leave requests move through different states.
+For example, PENDING → APPROVED, PENDING → REJECTED, PENDING → CANCELLED 
+
+Result:
+The system correctly allowed valid state changes and blocked invalid transitions.
