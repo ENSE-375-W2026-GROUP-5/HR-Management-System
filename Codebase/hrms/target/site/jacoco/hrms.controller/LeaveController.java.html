@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LeaveController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">hrms-sqlite</a> &gt; <a href="index.source.html" class="el_package">hrms.controller</a> &gt; <span class="el_source">LeaveController.java</span></div><h1>LeaveController.java</h1><pre class="source lang-java linenums">package hrms.controller;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import hrms.model.LeaveRequest;
+import hrms.model.LeaveType;
+import hrms.service.LeaveService;
+
+/*
+ * Controller layer for handling leave management operations.
+ */
+public class LeaveController {
+
+    private final LeaveService leaveService;
+
+<span class="nc" id="L17">    public LeaveController(LeaveService leaveService) {</span>
+<span class="nc" id="L18">        this.leaveService = leaveService;</span>
+<span class="nc" id="L19">    }</span>
+
+    /*
+     * Applies for a new leave request.
+     *
+     * @param requestId - unique identifier for the leave request
+     * @param employeeId - ID of the employee applying for leave
+     * @param leaveType - type of leave (e.g., SICK, VACATION)
+     * @param startDate - leave start date
+     * @param endDate - leave end date
+     * @param numberOfDays - total number of leave days
+     * @param reason - reason for leave
+     * @return the created LeaveRequest object
+     */
+    public LeaveRequest applyLeave(String requestId, String employeeId, LeaveType leaveType,
+                                   LocalDate startDate, LocalDate endDate, int numberOfDays,
+                                   String reason) {
+
+<span class="nc" id="L37">        return leaveService.applyLeave(</span>
+                requestId, employeeId, leaveType,
+                startDate, endDate, numberOfDays, reason
+        );
+    }
+
+    /*
+     * Retrieves a leave request by its ID.
+     */
+    public LeaveRequest getLeaveRequestById(String requestId) {
+<span class="nc" id="L47">        return leaveService.getLeaveRequestById(requestId);</span>
+    }
+
+    /*
+     * Retrieves all leave requests in the system.
+     */
+    public List&lt;LeaveRequest&gt; getAllLeaveRequests() {
+<span class="nc" id="L54">        return leaveService.getAllLeaveRequests();</span>
+    }
+
+    /*
+     * Approves a leave request.
+     *
+     * @param requestId - ID of the leave request
+     * @param approverEmployeeId - ID of the employee approving the request
+     */
+    public void approveLeave(String requestId, String approverEmployeeId) {
+<span class="nc" id="L64">        leaveService.approveLeave(requestId, approverEmployeeId);</span>
+<span class="nc" id="L65">    }</span>
+
+    /*
+     * Rejects a leave request.
+     *
+     * @param requestId - ID of the leave request
+     * @param approverEmployeeId - ID of the employee rejecting the request
+     */
+    public void rejectLeave(String requestId, String approverEmployeeId) {
+<span class="nc" id="L74">        leaveService.rejectLeave(requestId, approverEmployeeId);</span>
+<span class="nc" id="L75">    }</span>
+
+    /*
+     * Cancels a leave request
+     *
+     * @param requestId - ID of the leave request
+     * @param employeeId - ID of the employee cancelling the leave
+     */
+    public void cancelLeave(String requestId, String employeeId) {
+<span class="nc" id="L84">        leaveService.cancelLeave(requestId, employeeId);</span>
+<span class="nc" id="L85">    }</span>
+
+    /*
+     * Retrieves all leave requests submitted by a specific employee.
+     *
+     * @param employeeId - ID of the employee
+     * @return list of leave requests for that employee
+     */
+    public List&lt;LeaveRequest&gt; getLeaveRequestsByEmployee(String employeeId) {
+<span class="nc" id="L94">        return leaveService.getLeaveRequestsByEmployee(employeeId);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

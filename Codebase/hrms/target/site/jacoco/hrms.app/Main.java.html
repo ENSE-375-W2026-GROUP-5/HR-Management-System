@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">hrms-sqlite</a> &gt; <a href="index.source.html" class="el_package">hrms.app</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums">package hrms.app;
+
+import hrms.controller.AuthController;
+import hrms.controller.EmployeeController;
+import hrms.controller.LeaveController;
+import hrms.db.DatabaseInitializer;
+import hrms.model.Department;
+import hrms.model.EmploymentStatus;
+import hrms.model.Role;
+import hrms.repository.DepartmentRepository;
+import hrms.repository.EmployeeRepository;
+import hrms.repository.LeaveRepository;
+import hrms.repository.UserRepository;
+import hrms.service.AuthService;
+import hrms.service.DepartmentService;
+import hrms.service.EmployeeService;
+import hrms.service.LeaveService;
+import hrms.view.CommandLineUI;
+
+/*
+ * Main entry point of the HR Management System.
+ * Responsible for initializing the database, wiring all layers,
+ * adding default, and starting the UI.
+ */
+<span class="nc" id="L25">public class Main {</span>
+
+    public static void main(String[] args) {
+
+<span class="nc" id="L29">        DatabaseInitializer.initialize();</span>
+
+        // Repository Layer 
+<span class="nc" id="L32">        DepartmentRepository departmentRepository = new DepartmentRepository();</span>
+<span class="nc" id="L33">        EmployeeRepository employeeRepository = new EmployeeRepository();</span>
+<span class="nc" id="L34">        LeaveRepository leaveRepository = new LeaveRepository();</span>
+<span class="nc" id="L35">        UserRepository userRepository = new UserRepository();</span>
+
+        // Service Layer 
+<span class="nc" id="L38">        DepartmentService departmentService = new DepartmentService(departmentRepository);</span>
+<span class="nc" id="L39">        EmployeeService employeeService = new EmployeeService(employeeRepository);</span>
+<span class="nc" id="L40">        LeaveService leaveService = new LeaveService(leaveRepository, employeeRepository);</span>
+<span class="nc" id="L41">        AuthService authService = new AuthService(userRepository);</span>
+
+        // Controller Layer
+<span class="nc" id="L44">        EmployeeController employeeController = new EmployeeController(employeeService);</span>
+<span class="nc" id="L45">        LeaveController leaveController = new LeaveController(leaveService);</span>
+<span class="nc" id="L46">        AuthController authController = new AuthController(authService);</span>
+
+<span class="nc" id="L48">        seedInitialData(departmentService, employeeService, authService);</span>
+
+<span class="nc" id="L50">        CommandLineUI cli = new CommandLineUI(</span>
+                authController,
+                employeeController,
+                leaveController,
+                departmentService
+        );
+
+<span class="nc" id="L57">        cli.start();</span>
+<span class="nc" id="L58">    }</span>
+
+    /*
+     * Adding default data
+     * Uses try-catch to avoid duplicate insertion if data already exists.
+     */
+    private static void seedInitialData(DepartmentService departmentService,
+                                        EmployeeService employeeService,
+                                        AuthService authService) {
+
+        Department hr;
+        Department it;
+
+        try {
+<span class="nc" id="L72">            hr = departmentService.getDepartmentById(&quot;D001&quot;);</span>
+<span class="nc" id="L73">        } catch (Exception e) {</span>
+<span class="nc" id="L74">            hr = departmentService.addDepartment(&quot;D001&quot;, &quot;HR&quot;, &quot;Human Resources&quot;);</span>
+<span class="nc" id="L75">        }</span>
+
+        try {
+<span class="nc" id="L78">            it = departmentService.getDepartmentById(&quot;D002&quot;);</span>
+<span class="nc" id="L79">        } catch (Exception e) {</span>
+<span class="nc" id="L80">            it = departmentService.addDepartment(&quot;D002&quot;, &quot;IT&quot;, &quot;Information Technology&quot;);</span>
+<span class="nc" id="L81">        }</span>
+
+        try {
+<span class="nc" id="L84">            employeeService.getEmployeeById(&quot;E001&quot;);</span>
+<span class="nc" id="L85">        } catch (Exception e) {</span>
+<span class="nc" id="L86">            employeeService.addEmployee(</span>
+                    &quot;E001&quot;,
+                    &quot;Ishan Patel&quot;,
+                    &quot;ishan@company.com&quot;,
+                    &quot;3061111111&quot;,
+                    hr,
+                    Role.ADMIN,
+                    &quot;System Administrator&quot;,
+                    80000,
+                    20,
+                    EmploymentStatus.ACTIVE,
+                    null
+            );
+<span class="nc" id="L99">        }</span>
+
+        try {
+<span class="nc" id="L102">            employeeService.getEmployeeById(&quot;E002&quot;);</span>
+<span class="nc" id="L103">        } catch (Exception e) {</span>
+<span class="nc" id="L104">            employeeService.addEmployee(</span>
+                    &quot;E002&quot;,
+                    &quot;John Doe&quot;,
+                    &quot;john@company.com&quot;,
+                    &quot;3062222222&quot;,
+                    it,
+                    Role.MANAGER,
+                    &quot;IT Manager&quot;,
+                    70000,
+                    18,
+                    EmploymentStatus.ACTIVE,
+                    &quot;E001&quot;
+            );
+<span class="nc" id="L117">        }</span>
+
+        try {
+<span class="nc" id="L120">            employeeService.getEmployeeById(&quot;E003&quot;);</span>
+<span class="nc" id="L121">        } catch (Exception e) {</span>
+<span class="nc" id="L122">            employeeService.addEmployee(</span>
+                    &quot;E003&quot;,
+                    &quot;Anny Parker&quot;,
+                    &quot;anny@company.com&quot;,
+                    &quot;3063333333&quot;,
+                    it,
+                    Role.EMPLOYEE,
+                    &quot;Software Developer&quot;,
+                    55000,
+                    12,
+                    EmploymentStatus.ACTIVE,
+                    &quot;E002&quot;
+            );
+<span class="nc" id="L135">        }</span>
+
+        try {
+<span class="nc" id="L138">            authService.login(&quot;Ishan&quot;, &quot;admin123&quot;);</span>
+<span class="nc" id="L139">        } catch (Exception e) {</span>
+<span class="nc" id="L140">            authService.registerUser(&quot;Ishan&quot;, &quot;admin123&quot;, &quot;E001&quot;, Role.ADMIN);</span>
+<span class="nc" id="L141">        }</span>
+
+        try {
+<span class="nc" id="L144">            authService.login(&quot;John&quot;, &quot;manager123&quot;);</span>
+<span class="nc" id="L145">        } catch (Exception e) {</span>
+<span class="nc" id="L146">            authService.registerUser(&quot;John&quot;, &quot;manager123&quot;, &quot;E002&quot;, Role.MANAGER);</span>
+<span class="nc" id="L147">        }</span>
+
+        try {
+<span class="nc" id="L150">            authService.login(&quot;Anny&quot;, &quot;emp123&quot;);</span>
+<span class="nc" id="L151">        } catch (Exception e) {</span>
+<span class="nc" id="L152">            authService.registerUser(&quot;Anny&quot;, &quot;emp123&quot;, &quot;E003&quot;, Role.EMPLOYEE);</span>
+<span class="nc" id="L153">        }</span>
+<span class="nc" id="L154">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

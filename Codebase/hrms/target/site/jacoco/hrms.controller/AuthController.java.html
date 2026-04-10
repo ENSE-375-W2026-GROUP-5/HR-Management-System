@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">hrms-sqlite</a> &gt; <a href="index.source.html" class="el_package">hrms.controller</a> &gt; <span class="el_source">AuthController.java</span></div><h1>AuthController.java</h1><pre class="source lang-java linenums">package hrms.controller;
+
+import hrms.model.Role;
+import hrms.model.UserAccount;
+import hrms.service.AuthService;
+
+/*
+ * Controller layer for handling authentication-related requests.
+ */
+public class AuthController {
+
+    private final AuthService authService;
+
+
+<span class="fc" id="L15">    public AuthController(AuthService authService) {</span>
+<span class="fc" id="L16">        this.authService = authService;</span>
+<span class="fc" id="L17">    }</span>
+
+    /*
+     * Registers a new user in the system.
+     * Delegates the actual logic to AuthService.
+     *
+     * @param username - unique username for login
+     * @param password - user's password
+     * @param linkedEmployeeId - employee ID associated with this account
+     * @param role - role assigned to the user (e.g., ADMIN, EMPLOYEE)
+     * @return the created UserAccount object
+     */
+    public UserAccount registerUser(String username, String password, String linkedEmployeeId, Role role) {
+<span class="fc" id="L30">        return authService.registerUser(username, password, linkedEmployeeId, role);</span>
+    }
+
+    /*
+     * Authenticates a user using username and password.
+     *
+     * @param username - user's username
+     * @param password - user's password
+     * @return UserAccount if login is successful, otherwise it returns and exception 
+     */
+    public UserAccount login(String username, String password) {
+<span class="fc" id="L41">        return authService.login(username, password);</span>
+    }
+
+    /*
+     * Checks if a given user has a specific role.
+     *
+     * @param username - user's username
+     * @param role - role to check against
+     * @return true if user has the role, false otherwise
+     */
+    public boolean hasRole(String username, Role role) {
+<span class="fc" id="L52">        return authService.hasRole(username, role);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

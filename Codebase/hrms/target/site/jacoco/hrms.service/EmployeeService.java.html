@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmployeeService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">hrms-sqlite</a> &gt; <a href="index.source.html" class="el_package">hrms.service</a> &gt; <span class="el_source">EmployeeService.java</span></div><h1>EmployeeService.java</h1><pre class="source lang-java linenums">package hrms.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import hrms.model.Department;
+import hrms.model.Employee;
+import hrms.model.EmploymentStatus;
+import hrms.model.Role;
+import hrms.repository.EmployeeRepository;
+
+/*
+ * Service layer for handling employee-related business logic.
+ */
+public class EmployeeService {
+
+    private final EmployeeRepository employeeRepository;
+
+<span class="fc" id="L19">    public EmployeeService(EmployeeRepository employeeRepository) {</span>
+<span class="fc" id="L20">        this.employeeRepository = employeeRepository;</span>
+<span class="fc" id="L21">    }</span>
+
+    /*
+     * Adds a new employee to the system.
+     *
+     * @param employeeId - unique employee ID
+     * @param fullName - employee's full name
+     * @param email - employee's email
+     * @param phone - employee's phone number
+     * @param department - employee's department
+     * @param role - employee's role
+     * @param designation - employee's job title
+     * @param salary - employee's salary
+     * @param leaveBalance - available leave balance
+     * @param employmentStatus - current employment status
+     * @param managerId - ID of the employee's manager
+     * @return created Employee object
+     */
+    public Employee addEmployee(String employeeId, String fullName, String email, String phone,
+                                Department department, Role role, String designation,
+                                double salary, int leaveBalance,
+                                EmploymentStatus employmentStatus, String managerId) {
+
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (employeeRepository.existsById(employeeId)) {</span>
+<span class="fc" id="L45">            throw new IllegalArgumentException(&quot;Employee ID already exists.&quot;);</span>
+        }
+
+<span class="fc" id="L48">        Employee employee = new Employee(</span>
+                employeeId, fullName, email, phone,
+                department, role, designation,
+                salary, leaveBalance, employmentStatus, managerId
+        );
+
+<span class="fc" id="L54">        employeeRepository.save(employee);</span>
+<span class="fc" id="L55">        return employee;</span>
+    }
+
+    /*
+     * Retrieves an employee by ID.
+     *
+     * @param employeeId - employee ID to search for
+     * @return Employee object if found
+     */
+    public Employee getEmployeeById(String employeeId) {
+<span class="fc" id="L65">        Employee employee = employeeRepository.findById(employeeId);</span>
+
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if (employee == null) {</span>
+<span class="fc" id="L68">            throw new IllegalArgumentException(&quot;Employee not found.&quot;);</span>
+        }
+
+<span class="fc" id="L71">        return employee;</span>
+    }
+
+    /*
+     * Retrieves all employees in the system.
+     *
+     * @return list of all employees
+     */
+    public List&lt;Employee&gt; getAllEmployees() {
+<span class="nc" id="L80">        return new ArrayList&lt;&gt;(employeeRepository.findAll());</span>
+    }
+
+    /*
+     * Updates an employee's email address.
+     */
+    public void updateEmployeeEmail(String employeeId, String newEmail) {
+<span class="fc" id="L87">        Employee employee = getEmployeeById(employeeId);</span>
+<span class="fc" id="L88">        employee.setEmail(newEmail);</span>
+<span class="fc" id="L89">        employeeRepository.update(employee);</span>
+<span class="fc" id="L90">    }</span>
+
+    /*
+     * Updates an employee's phone number.
+     */
+    public void updateEmployeePhone(String employeeId, String newPhone) {
+<span class="fc" id="L96">        Employee employee = getEmployeeById(employeeId);</span>
+<span class="fc" id="L97">        employee.setPhone(newPhone);</span>
+<span class="fc" id="L98">        employeeRepository.update(employee);</span>
+<span class="fc" id="L99">    }</span>
+
+    /*
+     * Updates an employee's department.
+     */
+    public void updateEmployeeDepartment(String employeeId, Department newDepartment) {
+<span class="fc" id="L105">        Employee employee = getEmployeeById(employeeId);</span>
+<span class="fc" id="L106">        employee.setDepartment(newDepartment);</span>
+<span class="fc" id="L107">        employeeRepository.update(employee);</span>
+<span class="fc" id="L108">    }</span>
+
+    /*
+     * Updates an employee's designation.
+     */
+    public void updateEmployeeDesignation(String employeeId, String newDesignation) {
+<span class="nc" id="L114">        Employee employee = getEmployeeById(employeeId);</span>
+<span class="nc" id="L115">        employee.setDesignation(newDesignation);</span>
+<span class="nc" id="L116">        employeeRepository.update(employee);</span>
+<span class="nc" id="L117">    }</span>
+
+    /*
+     * Updates an employee's salary.
+     */
+    public void updateEmployeeSalary(String employeeId, double newSalary) {
+<span class="fc" id="L123">        Employee employee = getEmployeeById(employeeId);</span>
+<span class="fc" id="L124">        employee.setSalary(newSalary);</span>
+<span class="fc" id="L125">        employeeRepository.update(employee);</span>
+<span class="fc" id="L126">    }</span>
+
+    /*
+     * Updates an employee's current employment status.
+     */
+    public void updateEmployeeStatus(String employeeId, EmploymentStatus newStatus) {
+<span class="fc" id="L132">        Employee employee = getEmployeeById(employeeId);</span>
+<span class="fc" id="L133">        employee.setEmploymentStatus(newStatus);</span>
+<span class="fc" id="L134">        employeeRepository.update(employee);</span>
+<span class="fc" id="L135">    }</span>
+
+    /*
+     * Updates an employee's leave balance.
+     */
+    public void updateEmployeeLeaveBalance(String employeeId, int newLeaveBalance) {
+<span class="nc" id="L141">        Employee employee = getEmployeeById(employeeId);</span>
+<span class="nc" id="L142">        employee.setLeaveBalance(newLeaveBalance);</span>
+<span class="nc" id="L143">        employeeRepository.update(employee);</span>
+<span class="nc" id="L144">    }</span>
+
+    /*
+     * Deletes an employee from the system.
+     *
+     * @param employeeId - employee ID to delete
+     */
+    public void deleteEmployee(String employeeId) {
+        // Check that employee exists before attempting deletion
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">        if (!employeeRepository.existsById(employeeId)) {</span>
+<span class="nc" id="L154">            throw new IllegalArgumentException(&quot;Employee not found.&quot;);</span>
+        }
+
+<span class="fc" id="L157">        employeeRepository.deleteById(employeeId);</span>
+<span class="fc" id="L158">    }</span>
+
+    /*
+     * Retrieves all employees belonging to a specific department.
+     *
+     * @param departmentId - ID of the department
+     * @return list of employees in that department
+     */
+    public List&lt;Employee&gt; getEmployeesByDepartment(String departmentId) {
+<span class="fc" id="L167">        List&lt;Employee&gt; filteredEmployees = new ArrayList&lt;&gt;();</span>
+
+        // Filter employees manually by matching department ID
+<span class="fc bfc" id="L170" title="All 2 branches covered.">        for (Employee employee : employeeRepository.findAll()) {</span>
+<span class="fc bfc" id="L171" title="All 2 branches covered.">            if (employee.getDepartment().getDepartmentId().equals(departmentId)) {</span>
+<span class="fc" id="L172">                filteredEmployees.add(employee);</span>
+            }
+<span class="fc" id="L174">        }</span>
+
+<span class="fc" id="L176">        return filteredEmployees;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

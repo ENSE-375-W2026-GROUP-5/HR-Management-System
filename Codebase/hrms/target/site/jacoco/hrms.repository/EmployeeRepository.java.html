@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmployeeRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">hrms-sqlite</a> &gt; <a href="index.source.html" class="el_package">hrms.repository</a> &gt; <span class="el_source">EmployeeRepository.java</span></div><h1>EmployeeRepository.java</h1><pre class="source lang-java linenums">package hrms.repository;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import hrms.db.DatabaseConnection;
+import hrms.model.Department;
+import hrms.model.Employee;
+import hrms.model.EmploymentStatus;
+import hrms.model.Role;
+
+/*
+ * Repository class responsible for all database operations
+ * related to Employee objects.
+ */
+<span class="fc" id="L21">public class EmployeeRepository {</span>
+
+    public void save(Employee employee) {
+<span class="fc" id="L24">        String sql = &quot;&quot;&quot;</span>
+                INSERT INTO employees (
+                    employee_id, full_name, email, phone, department_id, role,
+                    designation, salary, leave_balance, employment_status, manager_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                &quot;&quot;&quot;;
+
+<span class="fc" id="L31">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L32">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+
+            // Set values for the INSERT query
+<span class="fc" id="L35">            ps.setString(1, employee.getEmployeeId());</span>
+<span class="fc" id="L36">            ps.setString(2, employee.getFullName());</span>
+<span class="fc" id="L37">            ps.setString(3, employee.getEmail());</span>
+<span class="fc" id="L38">            ps.setString(4, employee.getPhone());</span>
+<span class="fc" id="L39">            ps.setString(5, employee.getDepartment().getDepartmentId());</span>
+<span class="fc" id="L40">            ps.setString(6, employee.getRole().name());</span>
+<span class="fc" id="L41">            ps.setString(7, employee.getDesignation());</span>
+<span class="fc" id="L42">            ps.setDouble(8, employee.getSalary());</span>
+<span class="fc" id="L43">            ps.setInt(9, employee.getLeaveBalance());</span>
+<span class="fc" id="L44">            ps.setString(10, employee.getEmploymentStatus().name());</span>
+<span class="fc" id="L45">            ps.setString(11, employee.getManagerId());</span>
+
+<span class="fc" id="L47">            ps.executeUpdate();</span>
+
+<span class="nc" id="L49">        } catch (SQLException e) {</span>
+<span class="nc" id="L50">            throw new RuntimeException(&quot;Failed to save employee: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L51">        }</span>
+<span class="fc" id="L52">    }</span>
+
+    /*
+     * Finds an employee by their unique employee ID.
+     * Also joins the departments table to retrieve department details.
+     *
+     * @param employeeId - ID of the employee to search for
+     * @return Employee object if found, otherwise null
+     */
+    public Employee findById(String employeeId) {
+<span class="fc" id="L62">        String sql = &quot;&quot;&quot;</span>
+                SELECT e.*, d.department_id AS d_id, d.name AS d_name, d.description AS d_description
+                FROM employees e
+                JOIN departments d ON e.department_id = d.department_id
+                WHERE e.employee_id = ?
+                &quot;&quot;&quot;;
+
+<span class="fc" id="L69">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L70">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+
+            // Set employee ID in query
+<span class="fc" id="L73">            ps.setString(1, employeeId);</span>
+<span class="fc" id="L74">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="fc bfc" id="L76" title="All 2 branches covered.">            if (rs.next()) {</span>
+<span class="fc" id="L77">                Department department = new Department(</span>
+<span class="fc" id="L78">                        rs.getString(&quot;d_id&quot;),</span>
+<span class="fc" id="L79">                        rs.getString(&quot;d_name&quot;),</span>
+<span class="fc" id="L80">                        rs.getString(&quot;d_description&quot;)</span>
+                );
+
+<span class="fc" id="L83">                return new Employee(</span>
+<span class="fc" id="L84">                        rs.getString(&quot;employee_id&quot;),</span>
+<span class="fc" id="L85">                        rs.getString(&quot;full_name&quot;),</span>
+<span class="fc" id="L86">                        rs.getString(&quot;email&quot;),</span>
+<span class="fc" id="L87">                        rs.getString(&quot;phone&quot;),</span>
+                        department,
+<span class="fc" id="L89">                        Role.valueOf(rs.getString(&quot;role&quot;)),</span>
+<span class="fc" id="L90">                        rs.getString(&quot;designation&quot;),</span>
+<span class="fc" id="L91">                        rs.getDouble(&quot;salary&quot;),</span>
+<span class="fc" id="L92">                        rs.getInt(&quot;leave_balance&quot;),</span>
+<span class="fc" id="L93">                        EmploymentStatus.valueOf(rs.getString(&quot;employment_status&quot;)),</span>
+<span class="fc" id="L94">                        rs.getString(&quot;manager_id&quot;)</span>
+                );
+            }
+
+<span class="fc" id="L98">            return null;</span>
+
+<span class="pc bpc" id="L100" title="2 of 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L101">            throw new RuntimeException(&quot;Failed to fetch employee: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /*
+     * Checks whether an employee exists in the database.
+     *
+     * @param employeeId - ID of the employee
+     * @return true if the employee exists, false otherwise
+     */
+    public boolean existsById(String employeeId) {
+<span class="fc" id="L112">        String sql = &quot;SELECT 1 FROM employees WHERE employee_id = ?&quot;;</span>
+
+<span class="fc" id="L114">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L115">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+
+<span class="fc" id="L117">            ps.setString(1, employeeId);</span>
+<span class="fc" id="L118">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="fc" id="L120">            return rs.next();</span>
+
+<span class="nc" id="L122">        } catch (SQLException e) {</span>
+<span class="nc" id="L123">            throw new RuntimeException(&quot;Failed to check employee existence: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /*
+     * Deletes an employee record from the database using employee ID.
+     */
+    public void deleteById(String employeeId) {
+<span class="fc" id="L131">        String sql = &quot;DELETE FROM employees WHERE employee_id = ?&quot;;</span>
+
+<span class="fc" id="L133">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L134">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+
+<span class="fc" id="L136">            ps.setString(1, employeeId);</span>
+
+<span class="fc" id="L138">            ps.executeUpdate();</span>
+
+<span class="nc" id="L140">        } catch (SQLException e) {</span>
+<span class="nc" id="L141">            throw new RuntimeException(&quot;Failed to delete employee: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L142">        }</span>
+<span class="fc" id="L143">    }</span>
+
+    /*
+     * Retrieves all employees from the database.
+     * Also joins the departments table to include department information.
+     *
+     * @return collection of Employee objects
+     */
+    public Collection&lt;Employee&gt; findAll() {
+<span class="fc" id="L152">        String sql = &quot;&quot;&quot;</span>
+                SELECT e.*, d.department_id AS d_id, d.name AS d_name, d.description AS d_description
+                FROM employees e
+                JOIN departments d ON e.department_id = d.department_id
+                &quot;&quot;&quot;;
+
+<span class="fc" id="L158">        List&lt;Employee&gt; employees = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L160">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L161">             PreparedStatement ps = connection.prepareStatement(sql);</span>
+<span class="fc" id="L162">             ResultSet rs = ps.executeQuery()) {</span>
+
+<span class="fc bfc" id="L164" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L165">                Department department = new Department(</span>
+<span class="fc" id="L166">                        rs.getString(&quot;d_id&quot;),</span>
+<span class="fc" id="L167">                        rs.getString(&quot;d_name&quot;),</span>
+<span class="fc" id="L168">                        rs.getString(&quot;d_description&quot;)</span>
+                );
+
+<span class="fc" id="L171">                employees.add(new Employee(</span>
+<span class="fc" id="L172">                        rs.getString(&quot;employee_id&quot;),</span>
+<span class="fc" id="L173">                        rs.getString(&quot;full_name&quot;),</span>
+<span class="fc" id="L174">                        rs.getString(&quot;email&quot;),</span>
+<span class="fc" id="L175">                        rs.getString(&quot;phone&quot;),</span>
+                        department,
+<span class="fc" id="L177">                        Role.valueOf(rs.getString(&quot;role&quot;)),</span>
+<span class="fc" id="L178">                        rs.getString(&quot;designation&quot;),</span>
+<span class="fc" id="L179">                        rs.getDouble(&quot;salary&quot;),</span>
+<span class="fc" id="L180">                        rs.getInt(&quot;leave_balance&quot;),</span>
+<span class="fc" id="L181">                        EmploymentStatus.valueOf(rs.getString(&quot;employment_status&quot;)),</span>
+<span class="fc" id="L182">                        rs.getString(&quot;manager_id&quot;)</span>
+                ));
+<span class="fc" id="L184">            }</span>
+
+<span class="fc" id="L186">            return employees;</span>
+
+<span class="nc" id="L188">        } catch (SQLException e) {</span>
+<span class="nc" id="L189">            throw new RuntimeException(&quot;Failed to fetch employees: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /*
+     * Updates an existing employee's editable fields in the database.
+     *
+     * @param employee - Employee object containing updated information
+     */
+    public void update(Employee employee) {
+<span class="fc" id="L199">        String sql = &quot;&quot;&quot;</span>
+                UPDATE employees
+                SET email = ?, phone = ?, department_id = ?, designation = ?, salary = ?,
+                    leave_balance = ?, employment_status = ?, manager_id = ?
+                WHERE employee_id = ?
+                &quot;&quot;&quot;;
+
+<span class="fc" id="L206">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L207">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+
+<span class="fc" id="L209">            ps.setString(1, employee.getEmail());</span>
+<span class="fc" id="L210">            ps.setString(2, employee.getPhone());</span>
+<span class="fc" id="L211">            ps.setString(3, employee.getDepartment().getDepartmentId());</span>
+<span class="fc" id="L212">            ps.setString(4, employee.getDesignation());</span>
+<span class="fc" id="L213">            ps.setDouble(5, employee.getSalary());</span>
+<span class="fc" id="L214">            ps.setInt(6, employee.getLeaveBalance());</span>
+<span class="fc" id="L215">            ps.setString(7, employee.getEmploymentStatus().name());</span>
+<span class="fc" id="L216">            ps.setString(8, employee.getManagerId());</span>
+<span class="fc" id="L217">            ps.setString(9, employee.getEmployeeId());</span>
+
+<span class="fc" id="L219">            ps.executeUpdate();</span>
+
+<span class="nc" id="L221">        } catch (SQLException e) {</span>
+<span class="nc" id="L222">            throw new RuntimeException(&quot;Failed to update employee: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L223">        }</span>
+<span class="fc" id="L224">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

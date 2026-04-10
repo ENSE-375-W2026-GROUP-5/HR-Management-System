@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DepartmentRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">hrms-sqlite</a> &gt; <a href="index.source.html" class="el_package">hrms.repository</a> &gt; <span class="el_source">DepartmentRepository.java</span></div><h1>DepartmentRepository.java</h1><pre class="source lang-java linenums">package hrms.repository;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import hrms.db.DatabaseConnection;
+import hrms.model.Department;
+
+/*
+ * Repository class responsible for performing database operations
+ * related to the Department entity.
+ */
+<span class="fc" id="L18">public class DepartmentRepository {</span>
+
+    public void save(Department department) {
+<span class="fc" id="L21">        String sql = &quot;INSERT INTO departments (department_id, name, description) VALUES (?, ?, ?)&quot;;</span>
+
+<span class="fc" id="L23">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L24">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+
+            // Set values for the SQL query parameters
+<span class="fc" id="L27">            ps.setString(1, department.getDepartmentId());</span>
+<span class="fc" id="L28">            ps.setString(2, department.getName());</span>
+<span class="fc" id="L29">            ps.setString(3, department.getDescription());</span>
+
+            // Execute INSERT query
+<span class="fc" id="L32">            ps.executeUpdate();</span>
+
+<span class="nc" id="L34">        } catch (SQLException e) {</span>
+<span class="nc" id="L35">            throw new RuntimeException(&quot;Failed to save department: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L36">        }</span>
+<span class="fc" id="L37">    }</span>
+
+    /*
+     * Finds a department by its unique ID.
+     *
+     * @param departmentId - ID of the department to search for
+     * @return Department object if found, otherwise null
+     */
+    public Department findById(String departmentId) {
+<span class="fc" id="L46">        String sql = &quot;SELECT * FROM departments WHERE department_id = ?&quot;;</span>
+
+<span class="fc" id="L48">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L49">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+<span class="fc" id="L50">            ps.setString(1, departmentId);</span>
+<span class="fc" id="L51">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">            if (rs.next()) {</span>
+<span class="fc" id="L53">                return new Department(</span>
+<span class="fc" id="L54">                        rs.getString(&quot;department_id&quot;),</span>
+<span class="fc" id="L55">                        rs.getString(&quot;name&quot;),</span>
+<span class="fc" id="L56">                        rs.getString(&quot;description&quot;)</span>
+                );
+            }
+<span class="fc" id="L59">            return null;</span>
+
+<span class="pc bpc" id="L61" title="2 of 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L62">            throw new RuntimeException(&quot;Failed to fetch department: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /*
+     * Checks whether a department exists in the database.
+     *
+     * @param departmentId - ID of the department
+     * @return true if found, false otherwise
+     */
+    public boolean existsById(String departmentId) {
+<span class="fc" id="L73">        String sql = &quot;SELECT 1 FROM departments WHERE department_id = ?&quot;;</span>
+
+<span class="fc" id="L75">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L76">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+
+<span class="fc" id="L78">            ps.setString(1, departmentId);</span>
+<span class="fc" id="L79">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="fc" id="L81">            return rs.next();</span>
+
+<span class="nc" id="L83">        } catch (SQLException e) {</span>
+<span class="nc" id="L84">            throw new RuntimeException(&quot;Failed to check department existence: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /*
+     * Deletes a department from the database using its ID.
+     */
+    public void deleteById(String departmentId) {
+<span class="fc" id="L92">        String sql = &quot;DELETE FROM departments WHERE department_id = ?&quot;;</span>
+
+<span class="fc" id="L94">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L95">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+
+<span class="fc" id="L97">            ps.setString(1, departmentId);</span>
+<span class="fc" id="L98">            ps.executeUpdate();</span>
+
+<span class="nc" id="L100">        } catch (SQLException e) {</span>
+<span class="nc" id="L101">            throw new RuntimeException(&quot;Failed to delete department: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L102">        }</span>
+<span class="fc" id="L103">    }</span>
+
+    /*
+     * Retrieves all departments from the database.
+     *
+     * @return collection of all Department objects
+     */
+    public Collection&lt;Department&gt; findAll() {
+<span class="fc" id="L111">        String sql = &quot;SELECT * FROM departments&quot;;</span>
+<span class="fc" id="L112">        List&lt;Department&gt; departments = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L114">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L115">             PreparedStatement ps = connection.prepareStatement(sql);</span>
+<span class="fc" id="L116">             ResultSet rs = ps.executeQuery()) {</span>
+
+<span class="fc bfc" id="L118" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L119">                departments.add(new Department(</span>
+<span class="fc" id="L120">                        rs.getString(&quot;department_id&quot;),</span>
+<span class="fc" id="L121">                        rs.getString(&quot;name&quot;),</span>
+<span class="fc" id="L122">                        rs.getString(&quot;description&quot;)</span>
+                ));
+            }
+
+<span class="fc" id="L126">            return departments;</span>
+
+<span class="nc" id="L128">        } catch (SQLException e) {</span>
+<span class="nc" id="L129">            throw new RuntimeException(&quot;Failed to fetch departments: &quot; + e.getMessage(), e);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

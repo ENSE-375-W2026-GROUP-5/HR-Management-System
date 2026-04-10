@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LeaveService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">hrms-sqlite</a> &gt; <a href="index.source.html" class="el_package">hrms.service</a> &gt; <span class="el_source">LeaveService.java</span></div><h1>LeaveService.java</h1><pre class="source lang-java linenums">package hrms.service;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import hrms.model.Employee;
+import hrms.model.LeaveRequest;
+import hrms.model.LeaveStatus;
+import hrms.model.LeaveType;
+import hrms.model.Role;
+import hrms.repository.EmployeeRepository;
+import hrms.repository.LeaveRepository;
+
+/*
+ * Service layer for handling leave-related logic.
+ * Manages leave applications, approvals, rejections, cancellations,
+ * and retrieval of leave requests.
+ */
+public class LeaveService {
+
+    private final LeaveRepository leaveRepository;
+
+    private final EmployeeRepository employeeRepository;
+
+<span class="fc" id="L26">    public LeaveService(LeaveRepository leaveRepository, EmployeeRepository employeeRepository) {</span>
+<span class="fc" id="L27">        this.leaveRepository = leaveRepository;</span>
+<span class="fc" id="L28">        this.employeeRepository = employeeRepository;</span>
+<span class="fc" id="L29">    }</span>
+
+    /*
+     * Applies for a new leave request.
+     *
+     * @param requestId - unique leave request ID
+     * @param employeeId - ID of the employee requesting leave
+     * @param leaveType - type of leave
+     * @param startDate - start date of leave
+     * @param endDate - end date of leave
+     * @param numberOfDays - number of leave days requested
+     * @param reason - reason for leave
+     * @return created LeaveRequest object
+     */
+    public LeaveRequest applyLeave(String requestId, String employeeId, LeaveType leaveType,
+                                   LocalDate startDate, LocalDate endDate, int numberOfDays,
+                                   String reason) {
+
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        if (leaveRepository.existsById(requestId)) {</span>
+<span class="fc" id="L48">            throw new IllegalArgumentException(&quot;Leave request ID already exists.&quot;);</span>
+        }
+
+<span class="fc" id="L51">        Employee employee = employeeRepository.findById(employeeId);</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">        if (employee == null) {</span>
+<span class="nc" id="L53">            throw new IllegalArgumentException(&quot;Employee not found.&quot;);</span>
+        }
+
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        if (numberOfDays &gt; employee.getLeaveBalance()) {</span>
+<span class="fc" id="L57">            throw new IllegalArgumentException(&quot;Insufficient leave balance.&quot;);</span>
+        }
+
+<span class="fc" id="L60">        LeaveRequest leaveRequest = new LeaveRequest(</span>
+                requestId,
+                employeeId,
+                leaveType,
+                startDate,
+                endDate,
+                numberOfDays,
+                reason,
+                LeaveStatus.PENDING,
+                null
+        );
+
+<span class="fc" id="L72">        leaveRepository.save(leaveRequest);</span>
+<span class="fc" id="L73">        return leaveRequest;</span>
+    }
+
+    /*
+     * Retrieves a leave request by its ID.
+     *
+     * @param requestId - leave request ID
+     * @return LeaveRequest if found
+     */
+    public LeaveRequest getLeaveRequestById(String requestId) {
+<span class="fc" id="L83">        LeaveRequest leaveRequest = leaveRepository.findById(requestId);</span>
+
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        if (leaveRequest == null) {</span>
+<span class="nc" id="L86">            throw new IllegalArgumentException(&quot;Leave request not found.&quot;);</span>
+        }
+
+<span class="fc" id="L89">        return leaveRequest;</span>
+    }
+
+    /*
+     * Retrieves all leave requests in the system.
+     *
+     * @return list of all leave requests
+     */
+    public List&lt;LeaveRequest&gt; getAllLeaveRequests() {
+<span class="nc" id="L98">        return new ArrayList&lt;&gt;(leaveRepository.findAll());</span>
+    }
+
+    /*
+     * Approves a pending leave request.
+     * Only authorized roles can approve leave.
+     * Also deducts leave balance from the employee.
+     *
+     * @param requestId - leave request ID
+     * @param approverEmployeeId - ID of the employee approving the request
+     */
+    public void approveLeave(String requestId, String approverEmployeeId) {
+<span class="fc" id="L110">        LeaveRequest leaveRequest = getLeaveRequestById(requestId);</span>
+<span class="fc" id="L111">        Employee approver = employeeRepository.findById(approverEmployeeId);</span>
+
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">        if (approver == null) {</span>
+<span class="nc" id="L114">            throw new IllegalArgumentException(&quot;Approver not found.&quot;);</span>
+        }
+
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">        if (approver.getRole() != Role.ADMIN &amp;&amp;</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">            approver.getRole() != Role.HR_MANAGER &amp;&amp;</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">            approver.getRole() != Role.MANAGER) {</span>
+<span class="fc" id="L120">            throw new IllegalArgumentException(&quot;Unauthorized to approve leave.&quot;);</span>
+        }
+
+<span class="fc bfc" id="L123" title="All 2 branches covered.">        if (leaveRequest.getStatus() != LeaveStatus.PENDING) {</span>
+<span class="fc" id="L124">            throw new IllegalArgumentException(&quot;Only pending leave requests can be approved.&quot;);</span>
+        }
+
+<span class="fc" id="L127">        Employee employee = employeeRepository.findById(leaveRequest.getEmployeeId());</span>
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">        if (employee == null) {</span>
+<span class="nc" id="L129">            throw new IllegalArgumentException(&quot;Employee not found.&quot;);</span>
+        }
+
+<span class="fc" id="L132">        employee.setLeaveBalance(employee.getLeaveBalance() - leaveRequest.getNumberOfDays());</span>
+
+<span class="fc" id="L134">        leaveRequest.setStatus(LeaveStatus.APPROVED);</span>
+<span class="fc" id="L135">        leaveRequest.setApproverId(approverEmployeeId);</span>
+
+<span class="fc" id="L137">        employeeRepository.update(employee);</span>
+<span class="fc" id="L138">        leaveRepository.update(leaveRequest);</span>
+<span class="fc" id="L139">    }</span>
+
+    /*
+     * Rejects a pending leave request.
+     * Only authorized roles can reject leave.
+     *
+     * @param requestId - leave request ID
+     * @param approverEmployeeId - ID of the employee rejecting the request
+     */
+    public void rejectLeave(String requestId, String approverEmployeeId) {
+<span class="fc" id="L149">        LeaveRequest leaveRequest = getLeaveRequestById(requestId);</span>
+<span class="fc" id="L150">        Employee approver = employeeRepository.findById(approverEmployeeId);</span>
+
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">        if (approver == null) {</span>
+<span class="nc" id="L153">            throw new IllegalArgumentException(&quot;Approver not found.&quot;);</span>
+        }
+
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">        if (approver.getRole() != Role.ADMIN &amp;&amp;</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">            approver.getRole() != Role.HR_MANAGER &amp;&amp;</span>
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">            approver.getRole() != Role.MANAGER) {</span>
+<span class="nc" id="L159">            throw new IllegalArgumentException(&quot;Unauthorized to reject leave.&quot;);</span>
+        }
+
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">        if (leaveRequest.getStatus() != LeaveStatus.PENDING) {</span>
+<span class="nc" id="L163">            throw new IllegalArgumentException(&quot;Only pending leave requests can be rejected.&quot;);</span>
+        }
+
+<span class="fc" id="L166">        leaveRequest.setStatus(LeaveStatus.REJECTED);</span>
+<span class="fc" id="L167">        leaveRequest.setApproverId(approverEmployeeId);</span>
+<span class="fc" id="L168">        leaveRepository.update(leaveRequest);</span>
+<span class="fc" id="L169">    }</span>
+
+    /*
+     * Cancels a pending leave request.
+     * Employees are only allowed to cancel their own leave requests.
+     *
+     * @param requestId - leave request ID
+     * @param employeeId - ID of the employee cancelling the request
+     */
+    public void cancelLeave(String requestId, String employeeId) {
+<span class="fc" id="L179">        LeaveRequest leaveRequest = getLeaveRequestById(requestId);</span>
+
+<span class="pc bpc" id="L181" title="1 of 2 branches missed.">        if (!leaveRequest.getEmployeeId().equals(employeeId)) {</span>
+<span class="nc" id="L182">            throw new IllegalArgumentException(&quot;Employees can only cancel their own leave requests.&quot;);</span>
+        }
+
+<span class="pc bpc" id="L185" title="1 of 2 branches missed.">        if (leaveRequest.getStatus() != LeaveStatus.PENDING) {</span>
+<span class="nc" id="L186">            throw new IllegalArgumentException(&quot;Only pending leave requests can be cancelled.&quot;);</span>
+        }
+
+<span class="fc" id="L189">        leaveRequest.setStatus(LeaveStatus.CANCELLED);</span>
+<span class="fc" id="L190">        leaveRepository.update(leaveRequest);</span>
+<span class="fc" id="L191">    }</span>
+
+    /*
+     * Retrieves all leave requests made by a specific employee.
+     *
+     * @param employeeId - employee ID
+     * @return list of leave requests for that employee
+     */
+    public List&lt;LeaveRequest&gt; getLeaveRequestsByEmployee(String employeeId) {
+<span class="fc" id="L200">        List&lt;LeaveRequest&gt; employeeLeaves = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L202" title="All 2 branches covered.">        for (LeaveRequest leaveRequest : leaveRepository.findAll()) {</span>
+<span class="pc bpc" id="L203" title="1 of 2 branches missed.">            if (leaveRequest.getEmployeeId().equals(employeeId)) {</span>
+<span class="fc" id="L204">                employeeLeaves.add(leaveRequest);</span>
+            }
+<span class="fc" id="L206">        }</span>
+
+<span class="fc" id="L208">        return employeeLeaves;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

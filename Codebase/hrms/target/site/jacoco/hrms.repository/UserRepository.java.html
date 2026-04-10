@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">hrms-sqlite</a> &gt; <a href="index.source.html" class="el_package">hrms.repository</a> &gt; <span class="el_source">UserRepository.java</span></div><h1>UserRepository.java</h1><pre class="source lang-java linenums">package hrms.repository;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import hrms.db.DatabaseConnection;
+import hrms.model.Role;
+import hrms.model.UserAccount;
+
+/*
+ * Repository class responsible for database operations
+ * related to UserAccount entities.
+ */
+<span class="fc" id="L19">public class UserRepository {</span>
+
+    public void save(UserAccount userAccount) {
+<span class="fc" id="L22">        String sql = &quot;INSERT INTO users (username, password, linked_employee_id, role) VALUES (?, ?, ?, ?)&quot;;</span>
+
+<span class="fc" id="L24">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L25">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+
+<span class="fc" id="L27">            ps.setString(1, userAccount.getUsername());</span>
+<span class="fc" id="L28">            ps.setString(2, userAccount.getPassword());</span>
+<span class="fc" id="L29">            ps.setString(3, userAccount.getLinkedEmployeeId());</span>
+<span class="fc" id="L30">            ps.setString(4, userAccount.getRole().name());</span>
+
+<span class="fc" id="L32">            ps.executeUpdate();</span>
+
+<span class="nc" id="L34">        } catch (SQLException e) {</span>
+<span class="nc" id="L35">            throw new RuntimeException(&quot;Failed to save user: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L36">        }</span>
+<span class="fc" id="L37">    }</span>
+
+    /*
+     * Finds a user by their username.
+     *
+     * @param username - username to search for
+     * @return UserAccount if found, otherwise null
+     */
+    public UserAccount findByUsername(String username) {
+<span class="fc" id="L46">        String sql = &quot;SELECT * FROM users WHERE username = ?&quot;;</span>
+
+<span class="fc" id="L48">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L49">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+
+<span class="fc" id="L51">            ps.setString(1, username);</span>
+<span class="fc" id="L52">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="fc bfc" id="L54" title="All 2 branches covered.">            if (rs.next()) {</span>
+<span class="fc" id="L55">                return new UserAccount(</span>
+<span class="fc" id="L56">                        rs.getString(&quot;username&quot;),</span>
+<span class="fc" id="L57">                        rs.getString(&quot;password&quot;),</span>
+<span class="fc" id="L58">                        rs.getString(&quot;linked_employee_id&quot;),</span>
+<span class="fc" id="L59">                        Role.valueOf(rs.getString(&quot;role&quot;))</span>
+                );
+            }
+
+<span class="fc" id="L63">            return null;</span>
+
+<span class="pc bpc" id="L65" title="2 of 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L66">            throw new RuntimeException(&quot;Failed to fetch user: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /*
+     * Checks if a user exists in the database.
+     *
+     * @param username - username to check
+     * @return true if exists, false otherwise
+     */
+    public boolean existsByUsername(String username) {
+<span class="fc" id="L77">        String sql = &quot;SELECT 1 FROM users WHERE username = ?&quot;;</span>
+
+<span class="fc" id="L79">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L80">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+
+<span class="fc" id="L82">            ps.setString(1, username);</span>
+<span class="fc" id="L83">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="fc" id="L85">            return rs.next();</span>
+
+<span class="nc" id="L87">        } catch (SQLException e) {</span>
+<span class="nc" id="L88">            throw new RuntimeException(&quot;Failed to check user existence: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /*
+     * Deletes a user account from the database.
+     */
+    public void deleteByUsername(String username) {
+<span class="nc" id="L96">        String sql = &quot;DELETE FROM users WHERE username = ?&quot;;</span>
+
+<span class="nc" id="L98">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="nc" id="L99">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+
+<span class="nc" id="L101">            ps.setString(1, username);</span>
+
+<span class="nc" id="L103">            ps.executeUpdate();</span>
+
+<span class="nc" id="L105">        } catch (SQLException e) {</span>
+<span class="nc" id="L106">            throw new RuntimeException(&quot;Failed to delete user: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L107">        }</span>
+<span class="nc" id="L108">    }</span>
+
+    /*
+     * Retrieves all user accounts from the database.
+     *
+     * @return collection of UserAccount objects
+     */
+    public Collection&lt;UserAccount&gt; findAll() {
+<span class="nc" id="L116">        String sql = &quot;SELECT * FROM users&quot;;</span>
+<span class="nc" id="L117">        List&lt;UserAccount&gt; users = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L119">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="nc" id="L120">             PreparedStatement ps = connection.prepareStatement(sql);</span>
+<span class="nc" id="L121">             ResultSet rs = ps.executeQuery()) {</span>
+
+<span class="nc bnc" id="L123" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L124">                users.add(new UserAccount(</span>
+<span class="nc" id="L125">                        rs.getString(&quot;username&quot;),</span>
+<span class="nc" id="L126">                        rs.getString(&quot;password&quot;),</span>
+<span class="nc" id="L127">                        rs.getString(&quot;linked_employee_id&quot;),</span>
+<span class="nc" id="L128">                        Role.valueOf(rs.getString(&quot;role&quot;))</span>
+                ));
+            }
+
+<span class="nc" id="L132">            return users;</span>
+
+<span class="nc" id="L134">        } catch (SQLException e) {</span>
+<span class="nc" id="L135">            throw new RuntimeException(&quot;Failed to fetch users: &quot; + e.getMessage(), e);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

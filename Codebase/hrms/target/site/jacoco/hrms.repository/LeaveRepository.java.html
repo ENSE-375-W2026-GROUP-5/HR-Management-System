@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LeaveRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">hrms-sqlite</a> &gt; <a href="index.source.html" class="el_package">hrms.repository</a> &gt; <span class="el_source">LeaveRepository.java</span></div><h1>LeaveRepository.java</h1><pre class="source lang-java linenums">package hrms.repository;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import hrms.db.DatabaseConnection;
+import hrms.model.LeaveRequest;
+import hrms.model.LeaveStatus;
+import hrms.model.LeaveType;
+
+/*
+ * Repository class responsible for database operations
+ * related to LeaveRequest entities.
+ */
+<span class="fc" id="L21">public class LeaveRepository {</span>
+
+    public void save(LeaveRequest leaveRequest) {
+<span class="fc" id="L24">        String sql = &quot;&quot;&quot;</span>
+                INSERT INTO leave_requests (
+                    request_id, employee_id, leave_type, start_date, end_date,
+                    number_of_days, reason, status, approver_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                &quot;&quot;&quot;;
+
+<span class="fc" id="L31">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L32">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+
+            // Set parameters for INSERT query
+<span class="fc" id="L35">            ps.setString(1, leaveRequest.getRequestId());</span>
+<span class="fc" id="L36">            ps.setString(2, leaveRequest.getEmployeeId());</span>
+<span class="fc" id="L37">            ps.setString(3, leaveRequest.getLeaveType().name());</span>
+
+            // Dates are stored as strings (ISO format)
+<span class="fc" id="L40">            ps.setString(4, leaveRequest.getStartDate().toString());</span>
+<span class="fc" id="L41">            ps.setString(5, leaveRequest.getEndDate().toString());</span>
+
+<span class="fc" id="L43">            ps.setInt(6, leaveRequest.getNumberOfDays());</span>
+<span class="fc" id="L44">            ps.setString(7, leaveRequest.getReason());</span>
+<span class="fc" id="L45">            ps.setString(8, leaveRequest.getStatus().name());</span>
+<span class="fc" id="L46">            ps.setString(9, leaveRequest.getApproverId());</span>
+
+<span class="fc" id="L48">            ps.executeUpdate();</span>
+
+<span class="nc" id="L50">        } catch (SQLException e) {</span>
+<span class="nc" id="L51">            throw new RuntimeException(&quot;Failed to save leave request: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L52">        }</span>
+<span class="fc" id="L53">    }</span>
+
+    /*
+     * Retrieves a leave request by its ID.
+     *
+     * @param requestId - unique ID of the leave request
+     * @return LeaveRequest object if found, otherwise null
+     */
+    public LeaveRequest findById(String requestId) {
+<span class="fc" id="L62">        String sql = &quot;SELECT * FROM leave_requests WHERE request_id = ?&quot;;</span>
+
+<span class="fc" id="L64">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L65">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+
+<span class="fc" id="L67">            ps.setString(1, requestId);</span>
+<span class="fc" id="L68">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">            if (rs.next()) {</span>
+<span class="fc" id="L71">                return new LeaveRequest(</span>
+<span class="fc" id="L72">                        rs.getString(&quot;request_id&quot;),</span>
+<span class="fc" id="L73">                        rs.getString(&quot;employee_id&quot;),</span>
+<span class="fc" id="L74">                        LeaveType.valueOf(rs.getString(&quot;leave_type&quot;)),</span>
+<span class="fc" id="L75">                        LocalDate.parse(rs.getString(&quot;start_date&quot;)),</span>
+<span class="fc" id="L76">                        LocalDate.parse(rs.getString(&quot;end_date&quot;)),</span>
+<span class="fc" id="L77">                        rs.getInt(&quot;number_of_days&quot;),</span>
+<span class="fc" id="L78">                        rs.getString(&quot;reason&quot;),</span>
+<span class="fc" id="L79">                        LeaveStatus.valueOf(rs.getString(&quot;status&quot;)),</span>
+<span class="fc" id="L80">                        rs.getString(&quot;approver_id&quot;)</span>
+                );
+            }
+
+<span class="nc" id="L84">            return null;</span>
+
+<span class="pc bpc" id="L86" title="2 of 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L87">            throw new RuntimeException(&quot;Failed to fetch leave request: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /*
+     * Checks if a leave request exists in the database.
+     *
+     * @param requestId - ID of the leave request
+     * @return true if exists, false otherwise
+     */
+    public boolean existsById(String requestId) {
+<span class="fc" id="L98">        String sql = &quot;SELECT 1 FROM leave_requests WHERE request_id = ?&quot;;</span>
+
+<span class="fc" id="L100">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L101">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+
+<span class="fc" id="L103">            ps.setString(1, requestId);</span>
+<span class="fc" id="L104">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="fc" id="L106">            return rs.next();</span>
+
+<span class="nc" id="L108">        } catch (SQLException e) {</span>
+<span class="nc" id="L109">            throw new RuntimeException(&quot;Failed to check leave request existence: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /*
+     * Deletes a leave request from the database.
+     */
+    public void deleteById(String requestId) {
+<span class="nc" id="L117">        String sql = &quot;DELETE FROM leave_requests WHERE request_id = ?&quot;;</span>
+
+<span class="nc" id="L119">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="nc" id="L120">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+
+<span class="nc" id="L122">            ps.setString(1, requestId);</span>
+
+<span class="nc" id="L124">            ps.executeUpdate();</span>
+
+<span class="nc" id="L126">        } catch (SQLException e) {</span>
+<span class="nc" id="L127">            throw new RuntimeException(&quot;Failed to delete leave request: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L128">        }</span>
+<span class="nc" id="L129">    }</span>
+
+    /*
+     * Retrieves all leave requests from the database.
+     *
+     * @return collection of LeaveRequest objects
+     */
+    public Collection&lt;LeaveRequest&gt; findAll() {
+<span class="fc" id="L137">        String sql = &quot;SELECT * FROM leave_requests&quot;;</span>
+<span class="fc" id="L138">        List&lt;LeaveRequest&gt; requests = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L140">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L141">             PreparedStatement ps = connection.prepareStatement(sql);</span>
+<span class="fc" id="L142">             ResultSet rs = ps.executeQuery()) {</span>
+
+            // Convert each row into a LeaveRequest object
+<span class="fc bfc" id="L145" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L146">                requests.add(new LeaveRequest(</span>
+<span class="fc" id="L147">                        rs.getString(&quot;request_id&quot;),</span>
+<span class="fc" id="L148">                        rs.getString(&quot;employee_id&quot;),</span>
+<span class="fc" id="L149">                        LeaveType.valueOf(rs.getString(&quot;leave_type&quot;)),</span>
+<span class="fc" id="L150">                        LocalDate.parse(rs.getString(&quot;start_date&quot;)),</span>
+<span class="fc" id="L151">                        LocalDate.parse(rs.getString(&quot;end_date&quot;)),</span>
+<span class="fc" id="L152">                        rs.getInt(&quot;number_of_days&quot;),</span>
+<span class="fc" id="L153">                        rs.getString(&quot;reason&quot;),</span>
+<span class="fc" id="L154">                        LeaveStatus.valueOf(rs.getString(&quot;status&quot;)),</span>
+<span class="fc" id="L155">                        rs.getString(&quot;approver_id&quot;)</span>
+                ));
+            }
+
+<span class="fc" id="L159">            return requests;</span>
+
+<span class="nc" id="L161">        } catch (SQLException e) {</span>
+<span class="nc" id="L162">            throw new RuntimeException(&quot;Failed to fetch leave requests: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /*
+     * Updates the status and approver of an existing leave request.
+     *
+     * @param leaveRequest - LeaveRequest object with updated values
+     */
+    public void update(LeaveRequest leaveRequest) {
+<span class="fc" id="L172">        String sql = &quot;UPDATE leave_requests SET status = ?, approver_id = ? WHERE request_id = ?&quot;;</span>
+
+<span class="fc" id="L174">        try (Connection connection = DatabaseConnection.getConnection();</span>
+<span class="fc" id="L175">             PreparedStatement ps = connection.prepareStatement(sql)) {</span>
+
+            // Set updated values
+<span class="fc" id="L178">            ps.setString(1, leaveRequest.getStatus().name());</span>
+<span class="fc" id="L179">            ps.setString(2, leaveRequest.getApproverId());</span>
+<span class="fc" id="L180">            ps.setString(3, leaveRequest.getRequestId());</span>
+
+            // Execute UPDATE
+<span class="fc" id="L183">            ps.executeUpdate();</span>
+
+<span class="nc" id="L185">        } catch (SQLException e) {</span>
+<span class="nc" id="L186">            throw new RuntimeException(&quot;Failed to update leave request: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L187">        }</span>
+<span class="fc" id="L188">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
