@@ -77,14 +77,14 @@ Unit testing was used to test individual classes and methods in isolation, espec
     - Testing user registration and login in AuthService
     - Testing leave application, approval, rejection, and cancellation in LeaveService
 
-Result:
-The unit tests confirmed that the major business logic functions worked as expected for valid and invalid inputs.
+    Result:
+    The unit tests confirmed that the major business logic functions worked as expected for valid and invalid inputs.
 
 - Integration Testing
 Integration testing was used to verify that the SQLite database worked together correctly with the rest of the components
 
-Result:
-The integration test showed that the system components interacted correctly and that data was stored and retrieved properly from the database.
+    Result:
+    The integration test showed that the system components interacted correctly and that data was stored and retrieved properly from the database.
 
 - Equivalence Class Testing
 Equivalence class testing was used by dividing inputs into valid and invalid groups, then selecting representative values from each group. FOr example:
@@ -93,8 +93,8 @@ Equivalence class testing was used by dividing inputs into valid and invalid gro
     - Valid leave request vs leave request exceeding leave balance
     - Valid login credentials vs invalid credentials
 
-Result:
-This testing confirmed that the system correctly accepted valid input classes and rejected invalid ones.
+    Result:
+    This testing confirmed that the system correctly accepted valid input classes and rejected invalid ones.
 
 - Boundary Value Testing
 Boundary value testing was used to check values near the limits of valid input ranges. For example:
@@ -103,12 +103,12 @@ Boundary value testing was used to check values near the limits of valid input r
     - Leave balance values such as 0 and negative leave balance
     - Leave request days equal to available leave balance and greater than available leave balance
 
-Result:
-The system handled boundary conditions correctly in most tested cases, particularly for salary, leave balance, and leave request validation.
+    Result:
+    The system handled boundary conditions correctly in most tested cases, particularly for salary, leave balance, and leave request validation.
 
 - State transition testing 
 State transition testing was used for leave request processing because leave requests move through different states.
 For example, PENDING → APPROVED, PENDING → REJECTED, PENDING → CANCELLED 
 
-Result:
-The system correctly allowed valid state changes and blocked invalid transitions.
+    Result:
+    The system correctly allowed valid state changes and blocked invalid transitions.
