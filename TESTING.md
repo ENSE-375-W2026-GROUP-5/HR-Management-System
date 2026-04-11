@@ -61,15 +61,15 @@
 
 **Workflow Tested:**
 Department Creation (IT Department)
-↓
+->
 Employee Creation (Manager E001, Employee E002)
-↓
+->
 User Registration (Both users registered with roles)
-↓
+->
 Leave Application (Employee applies for 3-day vacation leave)
-↓
+->
 Leave Approval (Manager approves the leave request)
-↓
+->
 Validation (Leave status changed to APPROVED, leave balance updated 10→7)
 
 **Components Interaction:**
@@ -81,3 +81,4 @@ Validation (Leave status changed to APPROVED, leave balance updated 10→7)
 **Result:** All components work correctly together with proper data persistence
 
 ---
+
