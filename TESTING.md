@@ -190,3 +190,42 @@ Validation (Leave status changed to APPROVED, leave balance updated 10→7)
 **File:** `LeaveServiceTest.java`
 
 ---
+
+## 7. State Transition Testing
+
+**Leave Request State Machine:**
+              ┌─────────────┐
+              │  PENDING    │
+              └──────┬──────┘
+                /    |    \
+               /     |     \
+              /      |      \
+     APPROVED    REJECTED   CANCELLED
+       (✅)       (❌)         (⏹️)
+
+### 7.1 Valid State Transitions
+
+| Transition | From State | To State | Trigger | Test Case |
+|-----------|-----------|----------|---------|-----------|
+| 1 | PENDING | APPROVED | Manager approves leave | `shouldApproveLeaveSuccessfully()` |
+| 2 | PENDING | REJECTED | Manager rejects leave | `shouldRejectLeaveSuccessfully()` |
+| 3 | PENDING | CANCELLED | Employee cancels leave | `shouldCancelLeaveSuccessfully()` |
+
+### 7.2 Invalid State Transitions (Prevented by System)
+
+| Transition | From State | To State | Reason | Status |
+|-----------|-----------|----------|--------|--------|
+| Invalid 1 | APPROVED | PENDING | Cannot reverse approval | ❌ Blocked |
+| Invalid 2 | REJECTED | APPROVED | Cannot re-approve rejected | ❌ Blocked |
+| Invalid 3 | CANCELLED | PENDING | Cannot restore cancelled | ❌ Blocked |
+
+**File:** `LeaveServiceTest.java`
+**Model:** `LeaveRequest.java` validates state transitions
+
+**Test Examples:**
+- `shouldApproveLeaveSuccessfully()` - Tests PENDING → APPROVED
+- `shouldRejectLeaveSuccessfully()` - Tests PENDING → REJECTED
+- `shouldCancelLeaveSuccessfully()` - Tests PENDING → CANCELLED
+
+---
+
