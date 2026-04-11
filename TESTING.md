@@ -1,14 +1,24 @@
-TESTING.md file 
+# TESTING.md - HRMS Test Plan
 
-Select any function from the application and test it with below testing methods 
-o Path testing
-o Data flow
+## 1. Path Testing
 
-Units to perform Integration testing.
+**Selected Function:** `EmployeeService.addEmployee()`
 
-Validation performance of the HRMS application by using the following:
-o Boundary value testing
-o Equivalence class testing
-o Decision tables testing
-o State transition testing
-o Use case testing.
+**Execution Paths Tested:**
+
+1. **Happy Path (Valid Input)**
+   - File: `EmployeeServiceTest.java`
+   - Test: `shouldAddEmployeeSuccessfully()`
+   - Flow: Valid parameters → Employee created successfully → Returns Employee object
+   
+2. **Error Path (Duplicate Employee ID)**
+   - File: `EmployeeServiceTest.java`
+   - Test: `shouldThrowExceptionForDuplicateEmployeeId()`
+   - Flow: Duplicate ID provided → IllegalArgumentException thrown → Transaction rolled back
+
+3. **Data Flow Through Function:**
+   - Input: Employee ID, Name, Email, Phone, Department, Role, Designation, Salary, Leave Balance, Status, Manager ID
+   - Processing: Validation → Database insertion → Object creation
+   - Output: Employee object with persisted data
+
+---
