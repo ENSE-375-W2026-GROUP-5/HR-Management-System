@@ -131,7 +131,11 @@ Although the HR Management System successfully implements core functionalities s
 
 ### Conclusion and future work 
 The Human Resource Management System (HRMS) developed in this project successfully addresses the core design problem of managing employee data, authentication, departments, and leave requests in a structured and reliable manner. The system was implemented using Java with the MVC architecture, ensuring clear separation of concerns, modularity, and ease of testing.
+
 The final design achieved all major functional requirements, including employee creation and management, role-based user authentication, and complete leave request such as applying, approving, rejecting, and cancelling leave. Multiple testing techniques, including unit testing, integration testing, equivalence class testing, boundary value testing, decision table testing, and state transition testing, were applied to verify system correctness and robustness.
+
 The system has several limitations that provide room for future improvements. One major enhancement would be replacing the command line interface with a graphical interface to improve usability. Security can also be improved by implementing password hashing instead of storing passwords in plain text. Additionally, the system can be extended to include advanced HR functionalities such as payroll processing, attendance tracking, reporting dashboards, and automated notifications.
+
 Further improvements could be better input validation, support for concurrent users, and optimization of the database for handling larger datasets. Expanding test coverage and incorporating additional testing strategies would also improve system reliability.
+
 In conclusion, the project provides a functional and testable HRMS prototype that satisfies the project requirements.
