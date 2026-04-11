@@ -82,3 +82,35 @@ Validation (Leave status changed to APPROVED, leave balance updated 10→7)
 
 ---
 
+## 4. Boundary Value Testing
+
+**Tested Boundaries in HRMS Application:**
+
+### 4.1 Salary Boundaries
+- **Lower Boundary:** Salary = 0 (Invalid)
+- **Upper Boundary:** Salary = 1,000,000 (Valid)
+- **Negative:** Salary = -5000 (Invalid)
+- File: `EmployeeTest.java`
+
+### 4.2 Leave Balance Boundaries
+- **Lower Boundary:** Leave Balance = 0 (Valid but no leaves available)
+- **Upper Boundary:** Leave Balance = 30 (Valid maximum)
+- **Test Case:** `shouldThrowExceptionWhenLeaveExceedsBalance()`
+  - Employee has 10 leaves, requests 20 → Exception thrown
+  - Employee has 10 leaves, requests 10 → Approved
+  - Employee has 10 leaves, requests 11 → Exception thrown
+
+### 4.3 String Field Boundaries
+- **Empty String:** "" (Invalid for name, email, phone, designation)
+- **Blank String:** " " (Trimmed and validated)
+- **File:** `EmployeeTest.java`
+- **Tests:**
+  - `shouldThrowExceptionWhenFullNameIsBlank()`
+  - `shouldThrowExceptionWhenEmailIsBlank()`
+  - `shouldThrowExceptionWhenPhoneIsBlank()`
+
+### 4.4 Date Boundaries
+- **Valid:** StartDate ≤ EndDate
+- **Invalid:** StartDate > EndDate (Not tested but validated in service)
+
+---
