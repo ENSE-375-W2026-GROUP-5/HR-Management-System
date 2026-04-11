@@ -1,7 +1,9 @@
-## This is the code folder for HRMS
+### This is the code folder for HRMS
 
 ---
+
 The app uses maven and SQLite dependency so users do not need to install SQLite separately
+
 ---
 
 
