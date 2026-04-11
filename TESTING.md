@@ -114,3 +114,37 @@ Validation (Leave status changed to APPROVED, leave balance updated 10→7)
 - **Invalid:** StartDate > EndDate (Not tested but validated in service)
 
 ---
+
+## 5. Equivalence Class Testing
+
+**Partitioning inputs into valid and invalid equivalence classes:**
+
+### 5.1 Employee ID Equivalence Classes
+| Class | Example | Status | Test |
+|-------|---------|--------|------|
+| Valid IDs | "E001", "E002" | ✅ Accept | `shouldAddEmployeeSuccessfully()` |
+| Duplicate IDs | "E001" (already exists) | ❌ Reject | `shouldThrowExceptionForDuplicateEmployeeId()` |
+| Empty IDs | "" | ❌ Reject | `shouldThrowExceptionWhenEmployeeIdIsBlank()` |
+
+### 5.2 Login Credentials Equivalence Classes
+| Class | Username | Password | Expected Result | Test |
+|-------|----------|----------|-----------------|------|
+| Valid | "john" | "pass123" | ✅ Login Success | `shouldLoginSuccessfully()` |
+| Invalid Password | "john" | "wrongpass" | ❌ Exception | `shouldThrowExceptionForInvalidPassword()` |
+| Non-existent User | "ghost" | "pass123" | ❌ Exception | `shouldThrowExceptionWhenUserNotFound()` |
+
+### 5.3 Leave Request Equivalence Classes
+| Class | Days Requested | Available Balance | Expected Result | Test |
+|-------|----------------|--------------------|-----------------|------|
+| Valid | 3 | 10 | ✅ Approved | `shouldApplyLeaveSuccessfully()` |
+| Exceeds Balance | 20 | 10 | ❌ Exception | `shouldThrowExceptionWhenLeaveExceedsBalance()` |
+| Duplicate Request | "L001" | Valid | ❌ Exception | `shouldThrowExceptionForDuplicateLeaveRequestId()` |
+
+### 5.4 Email Field Equivalence Classes
+| Class | Example | Status |
+|-------|---------|--------|
+| Valid Format | "john@test.com" | ✅ Accept |
+| Empty String | "" | ❌ Reject |
+| File: `EmployeeTest.java` - `shouldThrowExceptionWhenEmailIsBlank()` |
+
+---
