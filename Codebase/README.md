@@ -18,22 +18,16 @@ The app uses maven and SQLite dependency so users do not need to install SQLite 
    ```
    mvn exec:java -Dexec.mainClass="hrms.app.Main"
    ```
----
 
 Use the following credentials for login 
 
-Role: ADMIN
-Username: Ishan 
-Password: admin123
+| Role     | Username | Password   |
+|----------|----------|------------|
+| ADMIN    | Ishan    | admin123   |
+| MANAGER  | John     | manager123 |
+| EMPLOYEE | Anny     | emp123     |
 
-Role: MANAGER
-Username: John
-Password: manager123
-
-Role: EMPLOYEE
-Username: Anny 
-Password: emp123
-
+---
 
 ### To run the tests
 1. cd to project root directory
