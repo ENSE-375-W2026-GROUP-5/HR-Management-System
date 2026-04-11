@@ -148,3 +148,45 @@ Validation (Leave status changed to APPROVED, leave balance updated 10→7)
 | File: `EmployeeTest.java` - `shouldThrowExceptionWhenEmailIsBlank()` |
 
 ---
+
+## 6. Decision Table Testing
+
+### 6.1 User Login Decision Table
+
+**Function:** `AuthService.login(username, password)`
+
+| Test Case | Username Exists | Password Correct | Role Valid | Expected Result | Test File |
+|-----------|-----------------|------------------|-----------|-----------------|-----------|
+| 1 | Yes | Yes | Yes | ✅ Login Success | `shouldLoginSuccessfully()` |
+| 2 | Yes | No | Yes | ❌ InvalidPasswordException | `shouldThrowExceptionForInvalidPassword()` |
+| 3 | No | - | - | ❌ UserNotFoundException | `shouldThrowExceptionWhenUserNotFound()` |
+
+**File:** `AuthServiceTest.java`
+
+### 6.2 Employee Creation Decision Table
+
+**Function:** `EmployeeService.addEmployee(...)`
+
+| Test Case | ID Exists | Name Valid | Email Valid | Department Valid | Status | Test |
+|-----------|-----------|-----------|-------------|------------------|--------|------|
+| 1 | No | Yes | Yes | Yes | ✅ Success | `shouldAddEmployeeSuccessfully()` |
+| 2 | Yes | Yes | Yes | Yes | ❌ DuplicateException | `shouldThrowExceptionForDuplicateEmployeeId()` |
+| 3 | No | No | Yes | Yes | ❌ InvalidName | `shouldThrowExceptionWhenFullNameIsBlank()` |
+| 4 | No | Yes | No | Yes | ❌ InvalidEmail | `shouldThrowExceptionWhenEmailIsBlank()` |
+| 5 | No | Yes | Yes | No | ❌ InvalidDept | `shouldThrowExceptionWhenDepartmentIsNull()` |
+
+**File:** `EmployeeTest.java`, `EmployeeServiceTest.java`
+
+### 6.3 Leave Approval Decision Table
+
+**Function:** `LeaveService.approveLeave(leaveId, approverId)`
+
+| Test Case | Leave Exists | Leave Status | Approver Valid | Expected Result | Test |
+|-----------|--------------|--------------|----------------|-----------------|------|
+| 1 | Yes | PENDING | Yes | ✅ Approved | `shouldApproveLeaveSuccessfully()` |
+| 2 | Yes | APPROVED | Yes | ❌ InvalidState | (Implicit validation) |
+| 3 | No | - | Yes | ❌ NotFound | (Implicit validation) |
+
+**File:** `LeaveServiceTest.java`
+
+---
