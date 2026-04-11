@@ -14,7 +14,7 @@
 - *Dur e Sameen Bukhari (200542362)*
 ---
 ### 1. Introduction
-This project implements a small to medium scale HR management system to implement core human resource functions and empli=oyee record management. The system will be built using a Model View Controller architecture and a test driven development process. The main goal of the the project is to design and execute testing suits using multiple testing techniques like boundary value analysis, equivalence class testing, decision table testing, state transition testing and use case testing. Together these techniques ensure that both normal and edge case behaviours are validated.
+This project implements a small to medium scale HR management system to implement core human resource functions and employee record management. The system will be built using a Model View Controller architecture and a test driven development process. The main goal of the the project is to design and execute testing suits using multiple testing techniques like boundary value analysis, equivalence class testing, decision table testing, state transition testing and use case testing. Together these techniques ensure that both normal and edge case behaviours are validated.
 
 ---
 
