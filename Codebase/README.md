@@ -20,6 +20,21 @@ The app uses maven and SQLite dependency so users do not need to install SQLite 
    ```
 ---
 
+Use the following credentials for login 
+
+Role: ADMIN
+Username: Ishan 
+Password: admin123
+
+Role: MANAGER
+Username: John
+Password: manager123
+
+Role: EMPLOYEE
+Username: Anny 
+Password: emp123
+
+
 ### To run the tests
 1. cd to project root directory
    ```
