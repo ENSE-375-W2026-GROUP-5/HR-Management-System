@@ -1,9 +1,0 @@
-hrms/service/LeaveServiceTest.class
-hrms/controller/EmployeeControllerTest.class
-hrms/service/EmployeeServiceTest.class
-hrms/controller/AuthControllerTest.class
-hrms/model/EmployeeTest.class
-hrms/service/AuthServiceTest.class
-hrms/service/DepartmentServiceTest.class
-hrms/model/DepartmentTest.class
-hrms/integration/HRSystemTest.class
