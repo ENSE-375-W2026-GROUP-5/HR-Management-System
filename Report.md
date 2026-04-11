@@ -38,6 +38,9 @@ Small organizations manage HR tasks using spreadsheets or informal processes. Th
 - Economic: Using free/open-source tools and software
 - Technical: Simple storage mechanism rather than a large DBMS
 - Time: Deliver an MVP within the given time frame
+
+---
+
 ### 3. Solution
 #### 3.1 Solution 1
 The initial solution was to make an HRMS which only allowed minimalistic functions like storing employee information and salary. It lacked several critical features required for a complete HR system. For example, it did not support leave management, role-based access control, or proper data validation.
@@ -123,6 +126,8 @@ Although the HR Management System successfully implements core functionalities s
 - Does not support multi user interaction
 - Simple database design is not optimized for large records
 - While testing was performed using multiple techniques, it is still not enough to get appropriate coverage.
+
+---
 
 ### Conclusion and future work 
 The Human Resource Management System (HRMS) developed in this project successfully addresses the core design problem of managing employee data, authentication, departments, and leave requests in a structured and reliable manner. The system was implemented using Java with the MVC architecture, ensuring clear separation of concerns, modularity, and ease of testing.
