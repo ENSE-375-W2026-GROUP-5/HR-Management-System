@@ -194,14 +194,11 @@ Validation (Leave status changed to APPROVED, leave balance updated 10→7)
 ## 7. State Transition Testing
 
 **Leave Request State Machine:**
-              ┌─────────────┐
-              │  PENDING    │
-              └──────┬──────┘
-                /    |    \
-               /     |     \
-              /      |      \
-     APPROVED    REJECTED   CANCELLED
-       (✅)       (❌)         (⏹️)
+
+A leave request starts in the **PENDING** state and can transition to three possible terminal states:
+- **APPROVED** (✅) - Manager approves the leave request
+- **REJECTED** (❌) - Manager rejects the leave request  
+- **CANCELLED** (⏹️) - Employee cancels their own leave request
 
 ### 7.1 Valid State Transitions
 
