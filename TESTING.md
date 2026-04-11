@@ -45,3 +45,39 @@
 - `shouldThrowExceptionWhenUserNotFound()` - User not found data path
 
 ---
+
+## 3. Integration Testing
+
+**Tested Components:**
+- DepartmentService + DepartmentRepository
+- EmployeeService + EmployeeRepository
+- AuthService + UserRepository
+- LeaveService + LeaveRepository
+- SQLite Database
+
+**Integration Test File:** `HRSystemTest.java`
+
+**Test Case: `shouldCompleteEmployeeLeaveWorkflow()`**
+
+**Workflow Tested:**
+Department Creation (IT Department)
+↓
+Employee Creation (Manager E001, Employee E002)
+↓
+User Registration (Both users registered with roles)
+↓
+Leave Application (Employee applies for 3-day vacation leave)
+↓
+Leave Approval (Manager approves the leave request)
+↓
+Validation (Leave status changed to APPROVED, leave balance updated 10→7)
+
+**Components Interaction:**
+- Service layer communicates with Repository layer
+- Repository layer persists/retrieves data from SQLite database
+- Data consistency maintained across multiple operations
+- Transactions rollback on errors
+
+**Result:** All components work correctly together with proper data persistence
+
+---
